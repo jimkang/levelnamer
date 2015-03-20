@@ -71,15 +71,17 @@ function buildLevels(word, relatedWords, done) {
     nameLevelName = levelNames.pop();
   }
 
-  var levelNameDistribution = distributeNamesUpToNameLevel({
+  var levelNameDistribution = distributeNamesAcrossLevels({
     levelNames: levelNames,
-    nameLevel: nameLevel
+    numberOfLevels: nameLevel - 1
   });
 
   levelNameDistribution.push(nameLevelName);
 
+  console.log(levelNameDistribution);
+
   // TODO: Post-name-level stuff.
-  
+
   // TODO: Make actual level objects.
   profile.levels = levelNameDistribution;
   done(null, profile);
@@ -101,19 +103,18 @@ function addRootPropertiesToProfile(probable, profile) {
   return profile;
 }
 
-function distributeNamesUpToNameLevel(opts) {
+function distributeNamesAcrossLevels(opts) {
   var distribution = [];
 
-  var probable;
   var levelNames;
-  var nameLevel;
+  var numberOfLevels;
 
   if (opts) {
     levelNames = opts.levelNames;
-    nameLevel = opts.nameLevel;
+    numberOfLevels = opts.numberOfLevels;
   }
 
-  var levelsPerName = levelNames.length/nameLevel;
+  var levelsPerName = levelNames.length/numberOfLevels;
   console.log('levelsPerName', levelsPerName);
   var currentNameIndex = 0;
 
@@ -123,13 +124,13 @@ function distributeNamesUpToNameLevel(opts) {
     distribution = distribution.concat(repeated);
   });
 
-  if (distribution.length < nameLevel - 1) {
+  if (distribution.length < numberOfLevels) {
     var lastLevelName = levelNames[levelNames.length - 1];
-    var filler = repeat(lastLevelName, nameLevel - 1 - distribution.length);
+    var filler = repeat(lastLevelName, numberOfLevels - distribution.length);
     distribution = distribution.concat(filler);
   }
-  else if (distribution.length > nameLevel - 1) {
-    distribution = distribution.slice(0, nameLevel - 1);
+  else if (distribution.length > numberOfLevels) {
+    distribution = distribution.slice(0, numberOfLevels);
   }
   return distribution;
 }
