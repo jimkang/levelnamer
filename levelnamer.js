@@ -6,6 +6,7 @@ var _ = require('lodash');
 var createIsCool = require('iscool');
 var createAggrandizer = require('aggrandizer').create;
 var differentiateLevelNames = require('./differentiate-level-names');
+var callBackOnNextTick = require('conform-async').callBackOnNextTick;
 
 var isCool = createIsCool();
 
@@ -19,14 +20,19 @@ function getNamedLevels(opts, done) {
   }
 
   if (!word) {
-    throw new Error('word not give to getNamedLevels.');
+    throw new Error('word not given to getNamedLevels.');
   }
+  if (!isCool(word)) {
+    throw new Error('Uncool word provided to getNamedLevels.');
+  }
+
   if (!wordnok) {
     wordnok = createWordnok({
       apiKey: config.wordnikAPIKey,
       // memoizeServerPort: 4040
     });
   }
+
 
   wordnok.getRelatedWords(
     {
@@ -45,12 +51,34 @@ function getNamedLevels(opts, done) {
   }
 }
 
+var subordinatePrefixes = [
+  'Junior',
+  'Apprentice',
+  'Assistant',
+  'Associate',
+  'Minor',
+  'Novice',
+  'Cadet',
+  'Student',
+  'Trainee',
+  'Intern',
+  'Lesser'
+];
+
+function generateSubordinateNames(base, count, probable) {
+  function appendBase(prefix) {
+    return prefix + ' ' + base;
+  }
+  return probable.shuffle(subordinatePrefixes).slice(count).map(appendBase);
+}
+
 function buildLevels(word, relatedWords, done) {
   var levelNames = sortWordsByPotential(relatedWords);
-  if (levelNames.length < 4) {
-    done(new Error('Could not find enough names for levels.'));
-    return;
-  }
+  // if (levelNames.length < 4) {
+  //   // Helpful user tip: Maybe check Unearthed Arcana.
+  //   done(new Error('Could not find enough names for levels.'));
+  //   return;
+  // }
 
   var probable = createProbable({
     random: seedrandom(word)
@@ -60,23 +88,27 @@ function buildLevels(word, relatedWords, done) {
     probable: probable
   });
 
-  var totalLevels = 10 + probable.rollDie(Math.max(levelNames.length/2, 8));
+  var profile = {
+    className: titleCase(word)
+  };
+  var nameLevelName = profile.className;
+
+  if (levelNames.length < 1) {
+    levelNames = generateSubordinateNames(
+      nameLevelName, 2 + probable.rollDie(6), probable
+    );
+  }
+
+  var totalLevels = 12 + probable.rollDie(Math.max(levelNames.length/2, 8));
 
   levelNames = levelNames.slice(0, totalLevels - 1);
   levelNames = levelNames.map(titleCase);
   levelNames = probable.shuffle(levelNames);
 
-  var profile = {
-    className: titleCase(word)
-  };
   addRootPropertiesToProfile(probable, profile);
 
   var nameLevel = 9 + probable.roll(totalLevels/4);
-  var nameLevelName = profile.className;
-  if (probable.roll(5) === 4) {
-    nameLevelName = levelNames.pop();
-  }
-
+  
   var levelNameDistribution = distributeNamesAcrossLevels({
     levelNames: levelNames,
     numberOfLevels: nameLevel - 1
@@ -94,8 +126,6 @@ function buildLevels(word, relatedWords, done) {
 
   levelNameDistribution = levelNameDistribution.concat(masterLevelNames);
   levelNameDistribution = differentiateLevelNames(levelNameDistribution);
-
-  console.log(levelNameDistribution);
 
   // TODO: Make actual level objects.
   profile.levels = levelNameDistribution;
@@ -129,12 +159,12 @@ function distributeNamesAcrossLevels(opts) {
     numberOfLevels = opts.numberOfLevels;
   }
 
-  var levelsPerName = levelNames.length/numberOfLevels;
-  console.log('levelsPerName', levelsPerName);
+  var namesPerLevel = numberOfLevels/levelNames.length;
+  console.log('namesPerLevel', namesPerLevel);
   var currentNameIndex = 0;
 
   levelNames.forEach(function addNameRepeatedly(levelName) {
-    var numberOfTimesToUse = ~~levelsPerName;
+    var numberOfTimesToUse = Math.max(~~namesPerLevel, 1);
     var repeated = repeat(levelName, numberOfTimesToUse);
     distribution = distribution.concat(repeated);
   });
@@ -161,16 +191,26 @@ function repeat(x, n) {
 var wordTypePreferenceOrder = [
   'synonym',
   'hyponym',
-  'hypernym',
-  'same-context'
+  // 'form',
+  // 'variant',
+  // 'cross-reference'
 ];
 
 function sortWordsByPotential(relatedWords) {
   var sortedCandidates = wordTypePreferenceOrder.reduce(concatIfTypeExists, []);
 
+  if (sortedCandidates.length < 5) {
+    sortedCandidates = concatIfTypeExists(sortedCandidates, 'hypernym');
+  }
+
+  if (sortedCandidates.length < 5) {
+    sortedCandidates = concatIfTypeExists(sortedCandidates, 'same-context');
+  }
+
   function concatIfTypeExists(array1, wordType) {
     return concatIfExists(array1, relatedWords[wordType]);
   }
+  console.log('relatedWords', relatedWords);
 
   return _.uniq(sortedCandidates).filter(isCool);
 }

@@ -85,7 +85,7 @@ test('Get a name level for a word.', function basicTest(t) {
   };
 
   var opts = {
-    word: 'Yob',
+    word: 'yob',
     // wordnok: 
     // random: 
   };
@@ -93,6 +93,7 @@ test('Get a name level for a word.', function basicTest(t) {
   levelnamer.getNamedLevels(opts, checkResults);
 
   function checkResults(error, result) {
+    console.log(error);
     t.ok(!error, 'Completes without an error.');
     t.equal(result.className, expectedResult.className, 'Returns a className.');
     t.equal(result.hitDie, expectedResult.hitDie, 'Returns a hit die type.');
