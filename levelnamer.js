@@ -34,10 +34,13 @@ function getNamedLevels(opts, done) {
   word = word.toLowerCase();
 
   if (!wordnok) {
-    wordnok = createWordnok({
-      apiKey: config.wordnikAPIKey,
-      // memoizeServerPort: 4040
-    });
+    var wordnokOpts = {
+      apiKey: config.wordnikAPIKey
+    };
+    if (opts.memoizeServerPort) {
+      wordnokOpts.memoizeServerPort = opts.memoizeServerPort;
+    }
+    wordnok = createWordnok(wordnokOpts);
   }
 
   wordnok.getRelatedWords(
@@ -52,7 +55,16 @@ function getNamedLevels(opts, done) {
       done(error);
     }
     else {
-      buildLevels(word, relatedWords, totalLevels, done);
+      prioritizeWords(wordnok, relatedWords, sendToBuildLevels);
+    }
+  }
+
+  function sendToBuildLevels(error, prioritizedRelatedWords) {
+    if (error) {
+      done(error);
+    }
+    else {
+      buildLevels(word, prioritizedRelatedWords, totalLevels, done);
     }
   }
 }
@@ -78,8 +90,8 @@ function generateSubordinateNames(base, count, probable) {
   return probable.shuffle(subordinatePrefixes).slice(count).map(appendBase);
 }
 
-function buildLevels(word, relatedWords, totalLevels, done) {
-  var levelNames = sortWordsByPotential(relatedWords);
+function buildLevels(word, prioritizedRelatedWords, totalLevels, done) {
+  var levelNames = prioritizedRelatedWords;
   // if (levelNames.length < 4) {
   //   // Helpful user tip: Maybe check Unearthed Arcana.
   //   done(new Error('Could not find enough names for levels.'));
@@ -177,7 +189,7 @@ var wordTypePreferenceOrder = [
   // 'cross-reference'
 ];
 
-function sortWordsByPotential(relatedWords) {
+function prioritizeWords(wordnok, relatedWords, done) {
   var sortedCandidates = wordTypePreferenceOrder.reduce(concatIfTypeExists, []);
 
   if (sortedCandidates.length < 5) {
@@ -193,7 +205,8 @@ function sortWordsByPotential(relatedWords) {
   }
   // console.log('relatedWords', relatedWords);
 
-  return _.uniq(sortedCandidates).filter(isCool);
+  sortedCandidates = _.uniq(sortedCandidates).filter(isCool);
+  filterOutNonNouns(wordnok, sortedCandidates, done);
 }
 
 function concatIfExists(array1, array2) {
@@ -204,6 +217,29 @@ function concatIfExists(array1, array2) {
     return array1;
   }
 }
+
+function filterOutNonNouns(wordnok, words, done) {
+  wordnok.getPartsOfSpeechForMultipleWords(words, applyFilter);
+  function applyFilter(error, partsOfSpeechArray) {    
+    var filtered;
+
+    if (error) {
+      done(error);
+    }
+    else {
+      filtered = words.filter(wordCorrespondsToANoun);
+    }
+
+    function wordCorrespondsToANoun(word, i) {
+      var partsOfSpeech = partsOfSpeechArray[i];
+      return partsOfSpeech.indexOf('noun') !== -1 || 
+        partsOfSpeech.indexOf('proper-noun') !== -1;
+    }
+
+    done(error, filtered);
+  }
+}
+
 
 var matchWordsRegex = /[\w-]+/g;
 

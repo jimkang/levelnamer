@@ -44,3 +44,34 @@ runNamingTest(
     'Master Yob'
   ]
 );
+
+runNamingTest(
+  'Make sure only nouns are used.',
+  {
+    word: 'engineer',
+    totalLevels: 20,
+    memoizeServerPort: 4444
+  },
+  [
+    'Hydraulician',
+    'Hydraulician (2nd level)',
+    'Machinist',
+    'Machinist (4th level)',
+    'Pioneer',
+    'Pioneer (6th level)',
+    'Driver',
+    'Driver (8th level)',
+    'Mechanician',
+    'Mechanician (10th level)',
+    'Mechanician (11th level)',
+    'Mechanician (12th level)',
+    'Engineer',
+    'Engineer (14th level)',
+    'Engineer (15th level)',
+    'Engineer Captain',
+    'Engineer Lord',
+    'Engineer Director-General',
+    'Engineer Potentate',
+    'Engineer Potentate (20th level)'
+  ]
+);
