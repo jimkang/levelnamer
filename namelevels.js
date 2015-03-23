@@ -4,6 +4,7 @@ var seedrandom = require('seedrandom');
 var createProbable = require('probable').createProbable;
 var _ = require('lodash');
 var createIsCool = require('iscool');
+var createAggrandizer = require('aggrandizer').create;
 
 var isCool = createIsCool();
 
@@ -54,6 +55,10 @@ function buildLevels(word, relatedWords, done) {
     random: seedrandom(word)
   });
 
+  var aggrandizer = createAggrandizer({
+    probable: probable
+  });
+
   var totalLevels = 10 + probable.rollDie(Math.max(levelNames.length/2, 8));
 
   levelNames = levelNames.slice(0, totalLevels - 1);
@@ -67,7 +72,7 @@ function buildLevels(word, relatedWords, done) {
 
   var nameLevel = 9 + probable.roll(totalLevels/4);
   var nameLevelName = profile.className;
-  if (probable.roll(3) == 0) {
+  if (probable.roll(5) === 4) {
     nameLevelName = levelNames.pop();
   }
 
@@ -78,9 +83,17 @@ function buildLevels(word, relatedWords, done) {
 
   levelNameDistribution.push(nameLevelName);
 
-  console.log(levelNameDistribution);
+  var masterLevelTitles = aggrandizer.aggrandize({
+    baseTitle: nameLevelName,
+    iterations: totalLevels - nameLevel
+  });
+  var titleGender = probable.roll(2);
+  var formatTitleWithGender = _.curry(aggrandizer.formatTitle)(titleGender);
+  var masterLevelNames = masterLevelTitles.map(formatTitleWithGender);
 
-  // TODO: Post-name-level stuff.
+  levelNameDistribution = levelNameDistribution.concat(masterLevelNames);
+
+  console.log(levelNameDistribution);
 
   // TODO: Make actual level objects.
   profile.levels = levelNameDistribution;
