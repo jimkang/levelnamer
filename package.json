@@ -24,6 +24,7 @@
     "aggrandizer": "^1.2.0",
     "iscool": "^1.0.9",
     "lodash": "^3.5.0",
+    "ordinal": "0.0.2",
     "probable": "^1.4.0",
     "seedrandom": "^2.3.11",
     "wordnok": "^2.2.0"

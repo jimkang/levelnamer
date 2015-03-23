@@ -5,6 +5,7 @@ var createProbable = require('probable').createProbable;
 var _ = require('lodash');
 var createIsCool = require('iscool');
 var createAggrandizer = require('aggrandizer').create;
+var differentiateLevelNames = require('./differentiate-level-names');
 
 var isCool = createIsCool();
 
@@ -92,6 +93,7 @@ function buildLevels(word, relatedWords, done) {
   var masterLevelNames = masterLevelTitles.map(formatTitleWithGender);
 
   levelNameDistribution = levelNameDistribution.concat(masterLevelNames);
+  levelNameDistribution = differentiateLevelNames(levelNameDistribution);
 
   console.log(levelNameDistribution);
 
