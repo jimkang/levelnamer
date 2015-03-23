@@ -7,8 +7,20 @@ var createIsCool = require('iscool');
 var createAggrandizer = require('aggrandizer').create;
 var differentiateLevelNames = require('./differentiate-level-names');
 var callBackOnNextTick = require('conform-async').callBackOnNextTick;
+var jsonfile = require('jsonFile');
 
-var isCool = createIsCool();
+var baseIsCool = createIsCool();
+var hypernymIsCool = createIsCool({
+  customBlacklist: jsonfile.readFileSync(
+    __dirname + '/custom-blacklists/hypernyms.json'
+  )
+});
+
+var sameContextIsCool = createIsCool({
+  customBlacklist: jsonfile.readFileSync(
+    __dirname + '/custom-blacklists/same-context-words.json'
+  )
+});
 
 function getNamedLevels(opts, done) {
   var word;
@@ -27,7 +39,7 @@ function getNamedLevels(opts, done) {
   if (!word) {
     throw new Error('word not given to getNamedLevels.');
   }
-  if (!isCool(word)) {
+  if (!baseIsCool(word)) {
     throw new Error('Uncool word provided to getNamedLevels.');
   }
 
@@ -193,11 +205,19 @@ function prioritizeWords(wordnok, relatedWords, done) {
   var sortedCandidates = wordTypePreferenceOrder.reduce(concatIfTypeExists, []);
 
   if (sortedCandidates.length < 5) {
-    sortedCandidates = concatIfTypeExists(sortedCandidates, 'hypernym');
+    // Some of them are bad, they're all likely to be terrible, so just skip 
+    // 'em all.
+    if (relatedWords.hypernym && relatedWords.hypernym.every(hypernymIsCool)) {
+      sortedCandidates = concatIfTypeExists(sortedCandidates, 'hypernym');
+    }
   }
 
   if (sortedCandidates.length < 5) {
-    sortedCandidates = concatIfTypeExists(sortedCandidates, 'same-context');
+    if (relatedWords['same-context'] && 
+      relatedWords['same-context'].every(sameContextIsCool)) {
+
+      sortedCandidates = concatIfTypeExists(sortedCandidates, 'same-context');
+    }
   }
 
   function concatIfTypeExists(array1, wordType) {
@@ -205,7 +225,7 @@ function prioritizeWords(wordnok, relatedWords, done) {
   }
   // console.log('relatedWords', relatedWords);
 
-  sortedCandidates = _.uniq(sortedCandidates).filter(isCool);
+  sortedCandidates = _.uniq(sortedCandidates).filter(baseIsCool);
   filterOutNonNouns(wordnok, sortedCandidates, done);
 }
 
