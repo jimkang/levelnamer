@@ -1,5 +1,5 @@
-var namelevels = require('./namelevels');
+var levelnamer = require('./levelnamer');
 
 module.exports = {
-  getNamedLevels: namelevels.getNamedLevels  
+  getNamedLevels: levelnamer.getNamedLevels  
 };

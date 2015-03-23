@@ -1,25 +1,27 @@
-namelevels
+levelnamer
 ==================
 
-This module is for something or other. For example:
-
-    code and what not
-
-Etc.!
+Generates 1E AD&D-style named levels given arbitrary 'classes'.
 
 Installation
 ------------
 
-    npm install namelevels
+    npm install levelnamer
 
 Usage
 -----
 
-    var someFactory = require('namelevels');
-    var thing = someFactory();
-    thing.use();
+    var levelnamer = require('levelnamer');
+    levelnamer.getNamedLevels(
+      {
+        word: 'Yob'
+      }, 
+      showResults
+    );
 
-Success!
+    function showResults(error, results) {
+      console.log(results);
+    }
 
 Tests
 -----

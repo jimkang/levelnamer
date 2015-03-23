@@ -1,5 +1,5 @@
 var test = require('tape');
-var namelevels = require('../index');
+var levelnamer = require('../index');
 
 test('Get a name level for a word.', function basicTest(t) {
   t.plan(13);
@@ -90,7 +90,7 @@ test('Get a name level for a word.', function basicTest(t) {
     // random: 
   };
 
-  namelevels.getNamedLevels(opts, checkResults);
+  levelnamer.getNamedLevels(opts, checkResults);
 
   function checkResults(error, result) {
     t.ok(!error, 'Completes without an error.');

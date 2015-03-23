@@ -1,5 +1,5 @@
 {
-  "name": "namelevels",
+  "name": "levelnamer",
   "version": "1.0.0",
   "description": "Generates 1E AD&D-style named levels given arbitrary 'classes'.",
   "main": "index.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:jimkang/namelevels.git"
+    "url": "git@github.com:jimkang/levelnamer.git"
   },
   "keywords": [],
   "author": "Jim Kang",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jimkang/namelevels/issues"
+    "url": "https://github.com/jimkang/levelnamer/issues"
   },
-  "homepage": "https://github.com/jimkang/namelevels",
+  "homepage": "https://github.com/jimkang/levelnamer",
   "devDependencies": {
     "tape": "^3.0.3"
   },
