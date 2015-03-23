@@ -262,7 +262,7 @@ function filterOutNonNouns(wordnok, words, done) {
 }
 
 
-var matchWordsRegex = /[\w-]+/g;
+var matchWordsRegex = /[\w\']+/g;
 
 function titleCase(str) {
   return str.replace(matchWordsRegex, titleCaseWord);
