@@ -194,6 +194,7 @@ function repeat(x, n) {
 }
 
 var wordTypePreferenceOrder = [
+  'equivalent',
   'synonym',
   'hyponym',
   // 'form',
