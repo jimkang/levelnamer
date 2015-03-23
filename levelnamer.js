@@ -13,12 +13,17 @@ var isCool = createIsCool();
 function getNamedLevels(opts, done) {
   var word;
   var wordnok;
+  var totalLevels;
 
   if (opts) {
     word = opts.word;
     wordnok = opts.wordnok;
+    totalLevels = opts.totalLevels;
   }
 
+  if (!totalLevels) {
+    throw new Error('totalLevels not given to getNamedLevels');
+  }
   if (!word) {
     throw new Error('word not given to getNamedLevels.');
   }
@@ -26,13 +31,14 @@ function getNamedLevels(opts, done) {
     throw new Error('Uncool word provided to getNamedLevels.');
   }
 
+  word = word.toLowerCase();
+
   if (!wordnok) {
     wordnok = createWordnok({
       apiKey: config.wordnikAPIKey,
       // memoizeServerPort: 4040
     });
   }
-
 
   wordnok.getRelatedWords(
     {
@@ -46,7 +52,7 @@ function getNamedLevels(opts, done) {
       done(error);
     }
     else {
-      buildLevels(word, relatedWords, done);
+      buildLevels(word, relatedWords, totalLevels, done);
     }
   }
 }
@@ -72,7 +78,7 @@ function generateSubordinateNames(base, count, probable) {
   return probable.shuffle(subordinatePrefixes).slice(count).map(appendBase);
 }
 
-function buildLevels(word, relatedWords, done) {
+function buildLevels(word, relatedWords, totalLevels, done) {
   var levelNames = sortWordsByPotential(relatedWords);
   // if (levelNames.length < 4) {
   //   // Helpful user tip: Maybe check Unearthed Arcana.
@@ -88,10 +94,7 @@ function buildLevels(word, relatedWords, done) {
     probable: probable
   });
 
-  var profile = {
-    className: titleCase(word)
-  };
-  var nameLevelName = profile.className;
+  var nameLevelName = titleCase(word);
 
   if (levelNames.length < 1) {
     levelNames = generateSubordinateNames(
@@ -99,13 +102,9 @@ function buildLevels(word, relatedWords, done) {
     );
   }
 
-  var totalLevels = 12 + probable.rollDie(Math.max(levelNames.length/2, 8));
-
   levelNames = levelNames.slice(0, totalLevels - 1);
   levelNames = levelNames.map(titleCase);
   levelNames = probable.shuffle(levelNames);
-
-  addRootPropertiesToProfile(probable, profile);
 
   var nameLevel = 9 + probable.roll(totalLevels/4);
   
@@ -127,25 +126,7 @@ function buildLevels(word, relatedWords, done) {
   levelNameDistribution = levelNameDistribution.concat(masterLevelNames);
   levelNameDistribution = differentiateLevelNames(levelNameDistribution);
 
-  // TODO: Make actual level objects.
-  profile.levels = levelNameDistribution;
-  done(null, profile);
-}
-
-function addRootPropertiesToProfile(probable, profile) {
-  // TODO: Probability table instead of flat array.
-  var hitDieNumber = probable.pickFromArray([2, 3, 4, 6, 8, 10, 12]);
-  profile.hitDie = 'd' + hitDieNumber;
-  if (hitDieNumber < 6) {
-    profile.lateLevelHpGain = 1;
-  }
-  else if (hitDieNumber > 8) {
-    profile.lateLevelHpGain = 3;
-  }
-  else {
-    profile.lateLevelHpGain = 2;
-  }
-  return profile;
+  done(null, levelNameDistribution);
 }
 
 function distributeNamesAcrossLevels(opts) {
@@ -160,7 +141,7 @@ function distributeNamesAcrossLevels(opts) {
   }
 
   var namesPerLevel = numberOfLevels/levelNames.length;
-  console.log('namesPerLevel', namesPerLevel);
+  // console.log('namesPerLevel', namesPerLevel);
   var currentNameIndex = 0;
 
   levelNames.forEach(function addNameRepeatedly(levelName) {
@@ -210,7 +191,7 @@ function sortWordsByPotential(relatedWords) {
   function concatIfTypeExists(array1, wordType) {
     return concatIfExists(array1, relatedWords[wordType]);
   }
-  console.log('relatedWords', relatedWords);
+  // console.log('relatedWords', relatedWords);
 
   return _.uniq(sortedCandidates).filter(isCool);
 }
