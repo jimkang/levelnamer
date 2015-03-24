@@ -21,7 +21,7 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "aggrandizer": "^1.2.0",
+    "aggrandizer": "^1.2.3",
     "canonicalizer": "^1.0.1",
     "conform-async": "^1.1.1",
     "iscool": "^1.0.9",
