@@ -8,6 +8,7 @@ var createAggrandizer = require('aggrandizer').create;
 var differentiateLevelNames = require('./differentiate-level-names');
 var callBackOnNextTick = require('conform-async').callBackOnNextTick;
 var jsonfile = require('jsonFile');
+var canonicalizer = require('canonicalizer');
 
 var baseIsCool = createIsCool();
 var hypernymIsCool = createIsCool({
@@ -44,6 +45,8 @@ function getNamedLevels(opts, done) {
   }
 
   word = word.toLowerCase();
+  var forms = canonicalizer.getSingularAndPluralForms(word);
+  word = forms[0];
 
   if (!wordnok) {
     var wordnokOpts = {
