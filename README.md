@@ -14,7 +14,11 @@ Usage
     var levelnamer = require('levelnamer');
     levelnamer.getNamedLevels(
       {
-        word: 'Yob'
+        word: 'Yob',
+        totalLevels: 20,
+        config: {
+          wordnikAPIKey: 'your-key-goes-here'
+        }
       }, 
       showResults
     );
@@ -22,6 +26,8 @@ Usage
     function showResults(error, results) {
       console.log(results);
     }
+
+You can optionally set `memoizeServerPort` in the opts if you are using [multilevel-cache-tools](https://github.com/jimkang/multilevel-cache-tools) with [wordnok](https://github.com/jimkang/wordnok) to memoize those calls.
 
 Tests
 -----

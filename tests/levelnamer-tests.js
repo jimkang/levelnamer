@@ -1,10 +1,12 @@
 var test = require('tape');
 var levelnamer = require('../index');
+var config = require('../config');
 
 function runNamingTest(testTitle, nameOpts, expectedResults) {
   test(testTitle, function testIt(t) {
     t.plan(nameOpts.totalLevels + 1);
 
+    nameOpts.config = config;
     levelnamer.getNamedLevels(nameOpts, checkResults);
 
     function checkResults(error, levelNames) {
@@ -12,6 +14,7 @@ function runNamingTest(testTitle, nameOpts, expectedResults) {
         console.log(error);
       }
       t.ok(!error, 'Completes without an error.');
+      // console.log(levelNames);
       levelNames.forEach(checkLevel);
     }
 
@@ -30,18 +33,18 @@ runNamingTest(
     totalLevels: 12
   },
   [
-    'Plug-ugly',
-    'Muscleman',
-    'Skinhead',
-    'Bullyboy',
     'Hooligan',
-    'Muscle',
-    'Tearaway',
+    'Muscleman',
     'Tough Guy',
+    'Bullyboy',
+    'Tearaway',
+    'Plug-Ugly',
     'Chav',
+    'Muscle',
+    'Skinhead',
+    'Skinhead (10th level)',
     'Yob',
-    'Prime Yob',
-    'Master Yob'
+    'Yob of the Body'
   ]
 );
 
@@ -53,26 +56,26 @@ runNamingTest(
     memoizeServerPort: 4444
   },
   [
-    'Hydraulician',
-    'Hydraulician (2nd level)',
-    'Machinist',
-    'Machinist (4th level)',
     'Pioneer',
-    'Pioneer (6th level)',
+    'Pioneer (2nd level)',
     'Driver',
-    'Driver (8th level)',
+    'Driver (4th level)',
+    'Hydraulician',
+    'Hydraulician (6th level)',
     'Mechanician',
-    'Mechanician (10th level)',
-    'Mechanician (11th level)',
-    'Mechanician (12th level)',
+    'Mechanician (8th level)',
+    'Machinist',
+    'Machinist (10th level)',
+    'Machinist (11th level)',
+    'Machinist (12th level)',
     'Engineer',
-    'Engineer (14th level)',
-    'Engineer (15th level)',
-    'Engineer Captain',
-    'Engineer Lord',
-    'Engineer Director-General',
-    'Engineer Potentate',
-    'Engineer Potentate (20th level)'
+    'Engineer of the Dawn',
+    'Engineer of the Dusk',
+    'Engineer of the Twilight',
+    'Engineer of the Twilight (17th level)',
+    'Engineer of the Twilight (18th level)',
+    'Expert Engineer of the Twilight',
+    'Prime Engineer of the Twilight'
   ]
 );
 
@@ -83,20 +86,20 @@ runNamingTest(
     totalLevels: 15,
   },
   [
-    "Acrocarp",
-    "Pleurocarp",
-    "Bog Moss",
-    "Acrocarpous Moss",
-    "Bog",
-    "Morass",
-    "Sphagnum",
-    "Sphagnum Moss",
-    "Moss",
-    "Moss (10th level)",
-    "Superior Moss",
-    "Arch Moss",
-    "Supreme Moss",
-    "Supreme Moss (14th level)",
-    "Supreme Moss (15th level)"
+    'Pleurocarpous Moss',
+    'Peat Moss',
+    'Morass',
+    'Acrocarp',
+    'Pleurocarp',
+    'Acrocarpous Moss',
+    'Bog',
+    'Sphagnum',
+    'Sphagnum Moss',
+    'Bog Moss',
+    'Bog Moss (11th level)',
+    'Moss',
+    'Moss (13th level)',
+    'Expert Moss',
+    'Prime Moss'
   ]
 );

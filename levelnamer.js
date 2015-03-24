@@ -1,5 +1,4 @@
 var createWordnok = require('wordnok').createWordnok;
-var config = require('./config');
 var seedrandom = require('seedrandom');
 var createProbable = require('probable').createProbable;
 var _ = require('lodash');
@@ -27,11 +26,13 @@ function getNamedLevels(opts, done) {
   var word;
   var wordnok;
   var totalLevels;
+  var config;
 
   if (opts) {
     word = opts.word;
     wordnok = opts.wordnok;
     totalLevels = opts.totalLevels;
+    config = opts.config;
   }
 
   if (!totalLevels) {
@@ -39,6 +40,9 @@ function getNamedLevels(opts, done) {
   }
   if (!word) {
     throw new Error('word not given to getNamedLevels.');
+  }
+  if (!config) {
+    throw new Error('config not given to getNamedLevels.');    
   }
   if (!baseIsCool(word)) {
     throw new Error('Uncool word provided to getNamedLevels.');
