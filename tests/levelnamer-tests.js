@@ -75,3 +75,28 @@ runNamingTest(
     'Engineer Potentate (20th level)'
   ]
 );
+
+runNamingTest(
+  'Make sure the singular form of the base title is used.',
+  {
+    word: 'mosses',
+    totalLevels: 15,
+  },
+  [
+    "Acrocarp",
+    "Pleurocarp",
+    "Bog Moss",
+    "Acrocarpous Moss",
+    "Bog",
+    "Morass",
+    "Sphagnum",
+    "Sphagnum Moss",
+    "Moss",
+    "Moss (10th level)",
+    "Superior Moss",
+    "Arch Moss",
+    "Supreme Moss",
+    "Supreme Moss (14th level)",
+    "Supreme Moss (15th level)"
+  ]
+);

@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "aggrandizer": "^1.2.0",
+    "canonicalizer": "^1.0.1",
     "conform-async": "^1.1.1",
     "iscool": "^1.0.9",
     "jsonfile": "^2.0.0",
