@@ -6,7 +6,7 @@ var createIsCool = require('iscool');
 var createAggrandizer = require('aggrandizer').create;
 var differentiateLevelNames = require('./differentiate-level-names');
 var callBackOnNextTick = require('conform-async').callBackOnNextTick;
-var jsonfile = require('jsonFile');
+var jsonfile = require('jsonfile');
 var canonicalizer = require('canonicalizer');
 
 var baseIsCool = createIsCool();
