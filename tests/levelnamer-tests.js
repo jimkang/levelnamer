@@ -53,7 +53,7 @@ runNamingTest(
   {
     word: 'engineer',
     totalLevels: 20,
-    memoizeServerPort: 4444
+    memoizeServerPort: 4848
   },
   [
     'Pioneer',
