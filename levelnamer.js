@@ -37,15 +37,19 @@ function getNamedLevels(opts, done) {
 
   if (!totalLevels) {
     done(new Error('totalLevels not given to getNamedLevels'));
+    return;
   }
   if (!word) {
     done(new Error('word not given to getNamedLevels.'));
+    return;
   }
   if (!config) {
     done(new Error('config not given to getNamedLevels.'));
+    return;
   }
   if (!baseIsCool(word)) {
     done(new Error('Uncool word provided to getNamedLevels.'));
+    return;
   }
 
   word = word.toLowerCase();
