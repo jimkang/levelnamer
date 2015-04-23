@@ -8,6 +8,9 @@ var differentiateLevelNames = require('./differentiate-level-names');
 var callBackOnNextTick = require('conform-async').callBackOnNextTick;
 var jsonfile = require('jsonfile');
 var canonicalizer = require('canonicalizer');
+var queue = require('queue-async');
+var WordPOS = require('wordpos');
+var wordpos = new WordPOS();
 
 var baseIsCool = createIsCool();
 var hypernymIsCool = createIsCool({
@@ -251,8 +254,10 @@ function concatIfExists(array1, array2) {
 }
 
 function filterOutNonNouns(wordnok, words, done) {
-  wordnok.getPartsOfSpeechForMultipleWords(words, applyFilter);
+  // wordnok.getPartsOfSpeechForMultipleWords(words, applyFilter);
+  getPartsOfSpeechForWords(words, applyFilter);
   function applyFilter(error, partsOfSpeechArray) {    
+    debugger;
     var filtered;
 
     if (error) {
@@ -272,6 +277,32 @@ function filterOutNonNouns(wordnok, words, done) {
   }
 }
 
+function getPartsOfSpeechForWords(words, done) {
+  var q = queue();
+  words.forEach(addToQueue);
+
+  function addToQueue(word) {
+    q.defer(adaptedGetPOS, word);
+  }
+
+  q.awaitAll(done);    
+}
+
+// getPos doesn't pass error as the first param to the callback. Hence, adapter.
+function adaptedGetPOS(text, callback) {
+  wordpos.getPOS(text, posDone);
+  function posDone(result) {
+    callback(null, wordPOSResultToWordnikResult(result));
+  }
+}
+
+function wordPOSResultToWordnikResult(posResult) {
+  var wordnikResult = [];
+  if (posResult.nouns.length > 0 || posResult.rest.length > 0) {
+    wordnikResult.push('noun');
+  }
+  return wordnikResult;
+}
 
 var matchWordsRegex = /[\w\']+/g;
 

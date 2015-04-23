@@ -29,7 +29,9 @@
     "lodash": "^3.5.0",
     "ordinal": "0.0.2",
     "probable": "^1.4.0",
+    "queue-async": "^1.0.7",
     "seedrandom": "^2.3.11",
-    "wordnok": "^2.2.1"
+    "wordnok": "^2.2.1",
+    "wordpos": "^0.1.15"
   }
 }
