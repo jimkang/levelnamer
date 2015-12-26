@@ -30,6 +30,6 @@
     "ordinal": "0.0.2",
     "probable": "^1.4.0",
     "seedrandom": "^2.3.11",
-    "wordnok": "^2.2.1"
+    "wordnok": "jimkang/wordnok#no-cache"
   }
 }
