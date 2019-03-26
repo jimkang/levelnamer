@@ -1,6 +1,6 @@
 {
   "name": "levelnamer",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Generates 1E AD&D-style named levels given arbitrary 'classes'.",
   "main": "index.js",
   "scripts": {
