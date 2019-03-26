@@ -1,13 +1,15 @@
+/* global __dirname */
+
 var createWordnok = require('wordnok').createWordnok;
 var seedrandom = require('seedrandom');
 var createProbable = require('probable').createProbable;
-var _ = require('lodash');
 var createIsCool = require('iscool');
 var createAggrandizer = require('aggrandizer').create;
 var differentiateLevelNames = require('./differentiate-level-names');
-var callBackOnNextTick = require('conform-async').callBackOnNextTick;
 var jsonfile = require('jsonfile');
 var canonicalizer = require('canonicalizer');
+var curry = require('lodash.curry');
+var uniq = require('lodash.uniq');
 
 var baseIsCool = createIsCool();
 var hypernymIsCool = createIsCool({
@@ -155,7 +157,7 @@ function buildLevels(word, prioritizedRelatedWords, totalLevels, done) {
     iterations: totalLevels - nameLevel
   });
   var titleGender = probable.roll(2);
-  var formatTitleWithGender = _.curry(aggrandizer.formatTitle)(titleGender);
+  var formatTitleWithGender = curry(aggrandizer.formatTitle)(titleGender);
   var masterLevelNames = masterLevelTitles.map(formatTitleWithGender);
 
   levelNameDistribution = levelNameDistribution.concat(masterLevelNames);
@@ -177,7 +179,6 @@ function distributeNamesAcrossLevels(opts) {
 
   var namesPerLevel = numberOfLevels/levelNames.length;
   // console.log('namesPerLevel', namesPerLevel);
-  var currentNameIndex = 0;
 
   levelNames.forEach(function addNameRepeatedly(levelName) {
     var numberOfTimesToUse = Math.max(~~namesPerLevel, 1);
@@ -219,13 +220,13 @@ function prioritizeWords(wordnok, relatedWords, done) {
   if (sortedCandidates.length < 5) {
     // Some of them are bad, they're all likely to be terrible, so just skip 
     // 'em all.
-    if (relatedWords.hypernym && relatedWords.hypernym.every(hypernymIsCool)) {
+    if (relatedWords && relatedWords.hypernym && relatedWords.hypernym.every(hypernymIsCool)) {
       sortedCandidates = concatIfTypeExists(sortedCandidates, 'hypernym');
     }
   }
 
   if (sortedCandidates.length < 5) {
-    if (relatedWords['same-context'] && 
+    if (relatedWords && relatedWords['same-context'] && 
       relatedWords['same-context'].every(sameContextIsCool)) {
 
       sortedCandidates = concatIfTypeExists(sortedCandidates, 'same-context');
@@ -233,11 +234,15 @@ function prioritizeWords(wordnok, relatedWords, done) {
   }
 
   function concatIfTypeExists(array1, wordType) {
-    return concatIfExists(array1, relatedWords[wordType]);
+    if (relatedWords) {
+      return concatIfExists(array1, relatedWords[wordType]);
+    } else {
+      return array1;
+    }
   }
   // console.log('relatedWords', relatedWords);
 
-  sortedCandidates = _.uniq(sortedCandidates).filter(baseIsCool);
+  sortedCandidates = uniq(sortedCandidates).filter(baseIsCool);
   filterOutNonNouns(wordnok, sortedCandidates, done);
 }
 
@@ -273,7 +278,7 @@ function filterOutNonNouns(wordnok, words, done) {
 }
 
 
-var matchWordsRegex = /[\w\']+/g;
+var matchWordsRegex = /[\w']+/g;
 
 function titleCase(str) {
   return str.replace(matchWordsRegex, titleCaseWord);
